@@ -1,0 +1,272 @@
+---
+title: "An introduction to tidycensus"
+author: "Ram Mandava"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. What worked well for you and what didn't work?
+
+Analyzed the US Census Data with help of existing R Studio code chunks and produce in terms of plots, tables, and caching data. These complex tasks can be segregated into sections to produce the results and converge in a publication (along with supplementary materials). Final “enriched document”, can back-trace and reproduce the entire analysis made or just part of it.
+
+If we have a good understanding of R programming, the maintainability and **reproducibility** of outcomes will be much easier to handle. 
+
+But some of the R code chunks didn't work and gave the below errors and were unable to fix the issues. 
+
+Examples:
+
+1. The API message returned is the error: unknown variable 'P01001'.
+
+2. Error in Use Method("gather"): no applicable method for 'gather' applied to an object of class "character".
+
+
+## 2. What do you see as the value of using RMarkdown?
+
+R Markdown is a subset of literate programming, which aims to make it simple to write reproducible web-based reports by combining text and source code into a single document. Used to create documents in many different formats, including HTML, PDF, and MS Word.
+
+Ability to break down into sections that give better readability. Both papers and supplementary materials can be enriched by documents that keep track of all code, data, and results produced during the analysis.
+
+
+## 3. Based on lab 2 so far, what things would you like to do?
+
+Familiarized with the United States Census and the US Census Bureau, and how Census data can be accessed and used by analysts.
+
+Importance of R package for working with US Census Bureau data in a tidy format.
+
+Understanding the basic data requests with the package and various options in the package.
+
+R programming techniques to streamline the data wrangling process for spatial Census data analysis and explore US Census data with visualization.
+Workflows and best practices for preparing data for visualization and building charts for presenting Census data analyses.    
+     
+    
+     
+## Getting started with tidycensus code chunks with results
+
+
+```{r}
+library(tidycensus)
+#census_api_key("1840a214a15b3834c5308103bdaf17009f4db1b4", install = TRUE)
+```
+
+
+```{r}
+total_population_10 <- get_decennial(
+  geography = "state", 
+  variables = "P001001",
+  year = 2010
+)
+
+print(total_population_10)
+```
+
+```{r}
+aian_2020 <- get_decennial(
+  geography = "state",
+  variables = "P1_005N",
+  year = 2020,
+  sumfile = "pl"
+)
+
+print(aian_2020)
+```
+
+```{r}
+born_in_mexico <- get_acs(
+  geography = "state", 
+  variables = "B05006_150",
+  year = 2020
+)
+
+print(born_in_mexico)
+```
+
+```{r}
+born_in_mexico_1yr <- get_acs(
+  geography = "state", 
+  variables = "B05006_150", 
+  survey = "acs1",
+  year = 2019
+)
+
+print(born_in_mexico_1yr)
+```
+
+```{r}
+age_table <- get_acs(
+  geography = "state", 
+  table = "B01001",
+  year = 2020
+)
+
+print(age_table)
+```
+
+```{r}
+cbsa_population <- get_acs(
+  geography = "cbsa",
+  variables = "B01003_001",
+  year = 2020
+)
+
+## Getting data from the 2016-2020 5-year ACS
+print(cbsa_population)
+```
+
+```{r}
+wi_income <- get_acs(
+  geography = "county", 
+  variables = "B19013_001", 
+  state = "WI",
+  year = 2020
+)
+
+print(wi_income)
+```
+
+```{r}
+dane_income <- get_acs(
+  geography = "tract", 
+  variables = "B19013_001", 
+  state = "WI", 
+  county = "Dane",
+  year = 2020
+)
+
+print(dane_income)
+
+nrow(wi_income)
+```
+
+```{r}
+wi_income_1yr <- get_acs(
+  geography = "county", 
+  variables = "B19013_001", 
+  state = "WI",
+  year = 2019,
+  survey = "acs1"
+)
+
+print(wi_income_1yr)
+
+nrow(wi_income_1yr)
+
+v16 <- load_variables(2016, "acs5", cache = TRUE)
+
+#View(v16)
+```
+
+```{r}
+hhinc <- get_acs(
+  geography = "state", 
+  table = "B19001", 
+  survey = "acs1",
+  year = 2016
+)
+
+print(hhinc)
+```
+
+```{r}
+hhinc_wide <- get_acs(
+  geography = "state", 
+  table = "B19001", 
+  survey = "acs1", 
+  year = 2016,
+  output = "wide"
+)
+
+print(hhinc_wide)
+```
+
+```{r}
+cimarron_blocks <- get_decennial(
+  geography = "block",
+  variables = "H1_001N",
+  state = "OK",
+  county = "Cimarron",
+  year = 2020,
+  sumfile = "pl"
+)
+
+print(cimarron_blocks)
+```
+
+```{r}
+ga <- get_acs(
+  geography = "county",
+  state = "Georgia",
+  variables = c(medinc = "B19013_001",
+                medage = "B01002_001"),
+  year = 2020
+)
+
+print(ga)
+```
+
+```{r}
+ga_wide <- get_acs(
+  geography = "county",
+  state = "Georgia",
+  variables = c(medinc = "B19013_001",
+                medage = "B01002_001"),
+  output = "wide",
+  year = 2020
+)
+
+print(ga_wide)
+```
+
+```{r}
+library(tidyverse)
+
+queens_components <- get_estimates(
+  geography = "county",
+  product = "components",
+  state = "NY",
+  county = "Queens",
+  year = 2019
+)
+
+print(queens_components)
+```
+
+```{r}
+louisiana_sex_hisp <- get_estimates(
+  geography = "state",
+  product = "characteristics",
+  breakdown = c("SEX", "HISP"),
+  breakdown_labels = TRUE,
+  state = "LA",
+  year = 2019
+)
+
+print(louisiana_sex_hisp)
+```
+
+```{r}
+honolulu_migration <- get_flows(
+  geography = "county",
+  state = "HI",
+  county = "Honolulu",
+  year = 2019
+)
+
+print(honolulu_migration)
+```
+
+
+```{r}
+cbsa_bachelors <- get_acs(
+  geography = "cbsa",
+  variables = "DP02_0068P",
+  year = 2019,
+  show_call = TRUE
+)
+
+print(cbsa_bachelors)
+```
+
